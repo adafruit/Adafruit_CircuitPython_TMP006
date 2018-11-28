@@ -13,7 +13,7 @@ Introduction
     :target: https://travis-ci.org/adafruit/Adafruit_CircuitPython_TMP006
     :alt: Build Status
 
-.. todo:: Describe what the library does.
+CircuitPython driver for the TMP006 contactless IR thermometer.
 
 Dependencies
 =============

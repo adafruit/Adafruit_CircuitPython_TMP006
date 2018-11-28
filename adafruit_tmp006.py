@@ -23,7 +23,7 @@
 `adafruit_tmp006`
 ====================================================
 
-CircuitPython driver for the TMP006 contactless IR thermometer
+CircuitPython driver for the TMP006 contactless IR thermometer.
 
 * Author(s): Carter Nelson
 
@@ -72,7 +72,6 @@ _TMP006_CFG_DRDYEN = const(0x0100)
 _TMP006_CFG_DRDY = const(0x0080)
 
 class TMP006:
-
     # Class-level buffer for reading and writing data with the sensor.
     # This reduces memory allocations but means the code is not re-entrant or
     # thread safe!
@@ -111,6 +110,7 @@ class TMP006:
 
     @property
     def temperature(self):
+        # pylint: disable=bad-whitespace, invalid-name, too-many-locals
         """Read object temperature from TMP006 sensor."""
         if not self.active:
             raise RuntimeError('Can not read from sensor when inactive.')
