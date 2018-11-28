@@ -105,10 +105,12 @@ class TMP006:
 
     @active.setter
     def active(self, val):
+        control = self._read_u16(_TMP006_CONFIG)
         if val:
-            self._wake()
+            control |= _TMP006_CFG_MODEON
         else:
-            self._sleep()
+            control &= ~(_TMP006_CFG_MODEON)
+        self._write_u16(_TMP006_CONFIG, control)
 
     @property
     def temperature(self):
@@ -118,15 +120,8 @@ class TMP006:
             raise RuntimeError('Can not read from sensor when inactive.')
         while not self._data_ready():
             pass
-        vobj = self.read_register(_TMP006_VOBJ)
-        vobj = bytearray((vobj & 0xFF, vobj >> 8 & 0xFF))
-        vobj = struct.unpack("<h", vobj)[0]
-        vobj = vobj * 156.25e-9  # volts
-        tamb = self.read_register(_TMP006_TAMB)
-        tamb = bytearray((tamb & 0xFF, tamb >> 8 & 0xFF))
-        tamb = struct.unpack("<h", tamb)[0]
-        tamb = (tamb >> 2) / 32.
-        tamb += 273.15 # kelvin
+        vobj = self._read_sensor_voltage()
+        tamb = self._read_die_temperature() + 273.15 # to kelvin
         # see TMP006 User Guide, section 5.1
         S0 = 6.4e-14 # nominal value
         a1 = 1.75e-3
@@ -143,25 +138,20 @@ class TMP006:
 
         TOBJ = (tamb**4 + (fVOBJ/S))**0.25
 
-        TOBJ -= 273.15 # back to celsius
+        return TOBJ - 273.15 # back to celsius
 
-        return TOBJ
-
-    def _sleep(self):
-        """Put TMP006 into low power sleep mode.  No measurement data will be
-        updated while in sleep mode.
-        """
-        control = self._read_u16(_TMP006_CONFIG)
-        control &= ~(_TMP006_CFG_MODEON)
-        self._write_u16(_TMP006_CONFIG, control)
-
-    def _wake(self):
-        """Wake up TMP006 from low power sleep mode."""
-        control = self._read_u16(_TMP006_CONFIG)
-        control |= _TMP006_CFG_MODEON
-        self._write_u16(_TMP006_CONFIG, control)
     def _data_ready(self):
         return (self.read_register(_TMP006_CONFIG) & _TMP006_CFG_DRDY) != 0
+
+    def _read_sensor_voltage(self):
+        vobj = self.read_register(_TMP006_VOBJ)
+        vobj = struct.unpack(">h", vobj.to_bytes(2, 'big'))[0]
+        return vobj * 156.25e-9  # volts
+
+    def _read_die_temperature(self):
+        tamb = self.read_register(_TMP006_TAMB)
+        tamb = struct.unpack(">h", tamb.to_bytes(2, 'big'))[0]
+        return (tamb >> 2) / 32.  # celsius
 
     def read_register(self, register):
         """Read sensor Register."""
