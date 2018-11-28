@@ -72,6 +72,10 @@ _TMP006_CFG_DRDYEN = const(0x0100)
 _TMP006_CFG_DRDY = const(0x0080)
 
 class TMP006:
+    """Class to represent an Adafruit TMP006 non-contact temperature measurement
+    board.
+    """
+
     # Class-level buffer for reading and writing data with the sensor.
     # This reduces memory allocations but means the code is not re-entrant or
     # thread safe!
