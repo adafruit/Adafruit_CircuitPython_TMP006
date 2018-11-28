@@ -29,7 +29,7 @@ This is easily achieved by downloading
 Usage Example
 =============
 
-.. todo:: Add a quick, simple example. It and other examples should live in the examples folder and be included in docs/examples.rst.
+Ensure your device works with the simple test in the examples folder.
 
 Contributing
 ============
