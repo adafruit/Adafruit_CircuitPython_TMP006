@@ -98,8 +98,6 @@ class TMP006:
         if dev_id != 0x67:
             raise RuntimeError('Init failed - Did not find TMP006')
 
-
-
     @property
     def active(self):
         """True if sensor is active."""
