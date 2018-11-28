@@ -52,7 +52,7 @@ setup(
     ],
 
     # What does your project relate to?
-    keywords='adafruit contactless ir thermometer temperature tmp006'
+    keywords='adafruit contactless ir thermometer temperature tmp006 '
              'hardware micropython circuitpython',
 
     # You can just specify the packages manually here if your project is
