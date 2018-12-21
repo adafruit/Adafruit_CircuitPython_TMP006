@@ -9,8 +9,8 @@ Introduction
     :target: https://discord.gg/nBQh6qu
     :alt: Discord
 
-.. image:: https://travis-ci.org/adafruit/Adafruit_CircuitPython_TMP006.svg?branch=master
-    :target: https://travis-ci.org/adafruit/Adafruit_CircuitPython_TMP006
+.. image:: https://travis-ci.com/adafruit/Adafruit_CircuitPython_TMP006.svg?branch=master
+    :target: https://travis-ci.com/adafruit/Adafruit_CircuitPython_TMP006
     :alt: Build Status
 
 CircuitPython driver for the TMP006 contactless IR thermometer.
