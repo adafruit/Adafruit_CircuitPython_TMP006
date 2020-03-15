@@ -71,6 +71,7 @@ CFG_16SAMPLE = const(0x0800)
 _TMP006_CFG_DRDYEN = const(0x0100)
 _TMP006_CFG_DRDY = const(0x0080)
 
+
 class TMP006:
     """Class to represent an Adafruit TMP006 non-contact temperature measurement
     board.
@@ -84,11 +85,18 @@ class TMP006:
     def __init__(self, i2c, address=_TMP006_I2CADDR, samplerate=CFG_16SAMPLE):
         self._device = I2CDevice(i2c, address)
         self._write_u16(_TMP006_CONFIG, _TMP006_CFG_RESET)
-        time.sleep(.5)
-        if samplerate not in (CFG_1SAMPLE, CFG_2SAMPLE, CFG_4SAMPLE, CFG_8SAMPLE,
-                              CFG_16SAMPLE):
-            raise ValueError('Unexpected samplerate value! Must be one of: ' \
-                'CFG_1SAMPLE, CFG_2SAMPLE, CFG_4SAMPLE, CFG_8SAMPLE, or CFG_16SAMPLE')
+        time.sleep(0.5)
+        if samplerate not in (
+            CFG_1SAMPLE,
+            CFG_2SAMPLE,
+            CFG_4SAMPLE,
+            CFG_8SAMPLE,
+            CFG_16SAMPLE,
+        ):
+            raise ValueError(
+                "Unexpected samplerate value! Must be one of: "
+                "CFG_1SAMPLE, CFG_2SAMPLE, CFG_4SAMPLE, CFG_8SAMPLE, or CFG_16SAMPLE"
+            )
         # Set configuration register to turn on chip, enable data ready output,
         # and start sampling at the specified rate.
         config = _TMP006_CFG_MODEON | _TMP006_CFG_DRDYEN | samplerate
@@ -96,7 +104,7 @@ class TMP006:
         # Check device ID match expected value.
         dev_id = self.read_register(_TMP006_DEVID)
         if dev_id != 0x67:
-            raise RuntimeError('Init failed - Did not find TMP006')
+            raise RuntimeError("Init failed - Did not find TMP006")
 
     @property
     def active(self):
@@ -117,13 +125,13 @@ class TMP006:
         # pylint: disable=bad-whitespace, invalid-name, too-many-locals
         """Read object temperature from TMP006 sensor."""
         if not self.active:
-            raise RuntimeError('Can not read from sensor when inactive.')
+            raise RuntimeError("Can not read from sensor when inactive.")
         while not self._data_ready():
             pass
         vobj = self._read_sensor_voltage()
-        tamb = self._read_die_temperature() + 273.15 # to kelvin
+        tamb = self._read_die_temperature() + 273.15  # to kelvin
         # see TMP006 User Guide, section 5.1
-        S0 = 6.4e-14 # nominal value
+        S0 = 6.4e-14  # nominal value
         a1 = 1.75e-3
         a2 = -1.678e-5
         TREF = 298.15
@@ -132,36 +140,36 @@ class TMP006:
         b2 = 4.63e-9
         c2 = 13.4
 
-        S = S0 * (1 + a1*(tamb - TREF) + a2*(tamb - TREF)**2)
-        VOS = b0 + b1*(tamb - TREF) + b2*(tamb - TREF)**2
-        fVOBJ = (vobj - VOS) + c2*(vobj - VOS)**2
+        S = S0 * (1 + a1 * (tamb - TREF) + a2 * (tamb - TREF) ** 2)
+        VOS = b0 + b1 * (tamb - TREF) + b2 * (tamb - TREF) ** 2
+        fVOBJ = (vobj - VOS) + c2 * (vobj - VOS) ** 2
 
-        TOBJ = (tamb**4 + (fVOBJ/S))**0.25
+        TOBJ = (tamb ** 4 + (fVOBJ / S)) ** 0.25
 
-        return TOBJ - 273.15 # back to celsius
+        return TOBJ - 273.15  # back to celsius
 
     def _data_ready(self):
         return (self.read_register(_TMP006_CONFIG) & _TMP006_CFG_DRDY) != 0
 
     def _read_sensor_voltage(self):
         vobj = self.read_register(_TMP006_VOBJ)
-        vobj = struct.unpack(">h", vobj.to_bytes(2, 'big'))[0]
+        vobj = struct.unpack(">h", vobj.to_bytes(2, "big"))[0]
         return vobj * 156.25e-9  # volts
 
     def _read_die_temperature(self):
         tamb = self.read_register(_TMP006_TAMB)
-        tamb = struct.unpack(">h", tamb.to_bytes(2, 'big'))[0]
-        return (tamb >> 2) / 32.  # celsius
+        tamb = struct.unpack(">h", tamb.to_bytes(2, "big"))[0]
+        return (tamb >> 2) / 32.0  # celsius
 
     def read_register(self, register):
         """Read sensor Register."""
-        return  self._read_u16(register)
+        return self._read_u16(register)
 
     def _read_u16(self, address):
         with self._device as i2c:
             self._BUFFER[0] = address & 0xFF
             i2c.write_then_readinto(self._BUFFER, self._BUFFER, out_end=1, in_end=2)
-        return self._BUFFER[0]<<8 | self._BUFFER[1]
+        return self._BUFFER[0] << 8 | self._BUFFER[1]
 
     def _write_u16(self, address, val):
         with self._device as i2c:
