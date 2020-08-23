@@ -122,7 +122,7 @@ class TMP006:
 
     @property
     def temperature(self):
-        # pylint: disable=bad-whitespace, invalid-name, too-many-locals
+        # pylint: disable=invalid-name, too-many-locals
         """Read object temperature from TMP006 sensor."""
         if not self.active:
             raise RuntimeError("Can not read from sensor when inactive.")
