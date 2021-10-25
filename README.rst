@@ -56,6 +56,11 @@ Usage Example
 
 Ensure your device works with the simple test in the examples folder.
 
+Documentation
+=============
+
+API documentation for this library can be found on `Read the Docs <https://circuitpython.readthedocs.io/projects/tmp006/en/latest/>`_.
+
 Contributing
 ============
 
