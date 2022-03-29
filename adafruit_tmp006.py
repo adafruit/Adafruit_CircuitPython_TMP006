@@ -127,7 +127,7 @@ class TMP006:
         VOS = b0 + b1 * (tamb - TREF) + b2 * (tamb - TREF) ** 2
         fVOBJ = (vobj - VOS) + c2 * (vobj - VOS) ** 2
 
-        TOBJ = (tamb ** 4 + (fVOBJ / S)) ** 0.25
+        TOBJ = (tamb**4 + (fVOBJ / S)) ** 0.25
 
         return TOBJ - 273.15  # back to celsius
 
