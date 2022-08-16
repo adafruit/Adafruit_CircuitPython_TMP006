@@ -30,7 +30,7 @@ import struct
 from micropython import const
 from adafruit_bus_device.i2c_device import I2CDevice
 
-__version__ = "0.0.0-auto.0"
+__version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_TMP006.git"
 
 # Default device I2C address.
