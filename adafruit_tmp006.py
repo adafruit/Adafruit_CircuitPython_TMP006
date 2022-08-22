@@ -30,6 +30,12 @@ import struct
 from micropython import const
 from adafruit_bus_device.i2c_device import I2CDevice
 
+try:
+    from typing_extensions import Literal
+    from busio import I2C
+except ImportError:
+    pass
+
 __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_TMP006.git"
 
@@ -65,7 +71,14 @@ class TMP006:
     # thread safe!
     _BUFFER = bytearray(4)
 
-    def __init__(self, i2c, address=_TMP006_I2CADDR, samplerate=CFG_16SAMPLE):
+    def __init__(
+        self,
+        i2c: I2C,
+        address: int = _TMP006_I2CADDR,
+        samplerate: Literal[
+            CFG_1SAMPLE, CFG_2SAMPLE, CFG_4SAMPLE, CFG_8SAMPLE, CFG_16SAMPLE
+        ] = CFG_16SAMPLE,
+    ) -> None:
         self._device = I2CDevice(i2c, address)
         self._write_u16(_TMP006_CONFIG, _TMP006_CFG_RESET)
         time.sleep(0.5)
@@ -90,12 +103,12 @@ class TMP006:
             raise RuntimeError("Init failed - Did not find TMP006")
 
     @property
-    def active(self):
+    def active(self) -> bool:
         """True if sensor is active."""
         return self._read_u16(_TMP006_CONFIG) & _TMP006_CFG_MODEON != 0
 
     @active.setter
-    def active(self, val):
+    def active(self, val: int) -> None:
         control = self._read_u16(_TMP006_CONFIG)
         if val:
             control |= _TMP006_CFG_MODEON
@@ -104,7 +117,7 @@ class TMP006:
         self._write_u16(_TMP006_CONFIG, control)
 
     @property
-    def temperature(self):
+    def temperature(self) -> float:
         # pylint: disable=invalid-name, too-many-locals
         """Read object temperature from TMP006 sensor."""
         if not self.active:
@@ -131,30 +144,30 @@ class TMP006:
 
         return TOBJ - 273.15  # back to celsius
 
-    def _data_ready(self):
+    def _data_ready(self) -> bool:
         return (self.read_register(_TMP006_CONFIG) & _TMP006_CFG_DRDY) != 0
 
-    def _read_sensor_voltage(self):
+    def _read_sensor_voltage(self) -> float:
         vobj = self.read_register(_TMP006_VOBJ)
         vobj = struct.unpack(">h", vobj.to_bytes(2, "big"))[0]
         return vobj * 156.25e-9  # volts
 
-    def _read_die_temperature(self):
+    def _read_die_temperature(self) -> float:
         tamb = self.read_register(_TMP006_TAMB)
         tamb = struct.unpack(">h", tamb.to_bytes(2, "big"))[0]
         return (tamb >> 2) / 32.0  # celsius
 
-    def read_register(self, register):
+    def read_register(self, register) -> int:
         """Read sensor Register."""
         return self._read_u16(register)
 
-    def _read_u16(self, address):
+    def _read_u16(self, address: int) -> int:
         with self._device as i2c:
             self._BUFFER[0] = address & 0xFF
             i2c.write_then_readinto(self._BUFFER, self._BUFFER, out_end=1, in_end=2)
         return self._BUFFER[0] << 8 | self._BUFFER[1]
 
-    def _write_u16(self, address, val):
+    def _write_u16(self, address: int, val: int) -> None:
         with self._device as i2c:
             self._BUFFER[0] = address & 0xFF
             self._BUFFER[1] = (val >> 8) & 0xFF
