@@ -25,14 +25,15 @@ Implementation Notes
  * Adafruit's Bus Device library: https://github.com/adafruit/Adafruit_CircuitPython_BusDevice
 """
 
-import time
 import struct
-from micropython import const
+import time
+
 from adafruit_bus_device.i2c_device import I2CDevice
+from micropython import const
 
 try:
-    from typing_extensions import Literal
     from busio import I2C
+    from typing_extensions import Literal
 except ImportError:
     pass
 
@@ -82,13 +83,13 @@ class TMP006:
         self._device = I2CDevice(i2c, address)
         self._write_u16(_TMP006_CONFIG, _TMP006_CFG_RESET)
         time.sleep(0.5)
-        if samplerate not in (
+        if samplerate not in {
             CFG_1SAMPLE,
             CFG_2SAMPLE,
             CFG_4SAMPLE,
             CFG_8SAMPLE,
             CFG_16SAMPLE,
-        ):
+        }:
             raise ValueError(
                 "Unexpected samplerate value! Must be one of: "
                 "CFG_1SAMPLE, CFG_2SAMPLE, CFG_4SAMPLE, CFG_8SAMPLE, or CFG_16SAMPLE"
@@ -118,7 +119,6 @@ class TMP006:
 
     @property
     def temperature(self) -> float:
-        # pylint: disable=invalid-name, too-many-locals
         """Read object temperature from TMP006 sensor."""
         if not self.active:
             raise RuntimeError("Can not read from sensor when inactive.")

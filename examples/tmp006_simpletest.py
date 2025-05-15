@@ -2,8 +2,10 @@
 # SPDX-License-Identifier: MIT
 
 import time
+
 import board
 import busio
+
 import adafruit_tmp006
 
 
@@ -21,7 +23,5 @@ sensor = adafruit_tmp006.TMP006(i2c)
 # The first sample will be meaningless
 while True:
     obj_temp = sensor.temperature
-    print(
-        "Object temperature: {0:0.3F}*C / {1:0.3F}*F".format(obj_temp, c_to_f(obj_temp))
-    )
+    print(f"Object temperature: {obj_temp:0.3F}*C / {c_to_f(obj_temp):0.3F}*F")
     time.sleep(5.0)
